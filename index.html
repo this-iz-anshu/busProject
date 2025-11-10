@@ -67,32 +67,30 @@
         .route { font-size: 22px; margin-bottom: 15px; }
 
         /* ✅ Buildings + Bus Scene */
-       .bus-scene {
-    position: relative;
-    width: 100%;
-    height: 180px;   /* ✅ Increased from 150px */
-    overflow: hidden;
-    margin-bottom: 20px;
-}
+        .bus-scene {
+            position: relative;
+            width: 100%;
+            height: 150px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
 
-.buildings {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: auto;
-    height: 100%;
-    object-fit: contain;
-    z-index: 1;   /* ✅ Background */
-}
+        .buildings {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
 
-.bus {
-    position: absolute;
-    bottom: 5px;
-    width: 240px;
-    z-index: 5;   /* ✅ Bring bus in front */
-    animation: busMove 3s linear infinite;
-}
-
+        .bus {
+            position: absolute;
+            bottom: 5px;
+            width: 240px;
+            z-index: 2;
+            animation: busMove 3s linear infinite;
+        }
 
         @keyframes busMove {
             0% { left: -300px; }
@@ -131,13 +129,13 @@
     <div class="content">
         <div class="pass-card">
 
-            
+            <div class="pass-title">UNBSU Undergrad Pass</div>
 
             <div id="date" class="date"></div>
             <div id="clock" class="time"></div>
 
-            <div class="transit-name">Codiac Transit</div>
-            <div class="route">51N</div>
+            <div class="transit-name">Fredericton Transit</div>
+            <div class="route">10N Carlisle</div>
 
             <!-- ✅ Buildings + Bus From Folder -->
             <div class="bus-scene">
@@ -147,7 +145,7 @@
 
             <button class="expire-btn">Expire</button>
             <div class="expire-text">This pass expires after 14 minutes</div>
-            <div class="user-id">User ID 111157853</div>
+            <div class="user-id">User ID 1111578593</div>
 
         </div>
     </div>
