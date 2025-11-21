@@ -1,214 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mobile Transit Pass</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        /* Using a common system font stack for better cross-platform consistency */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-        }
-        
-        /* Custom Keyframes for Bus Animation */
-        @keyframes busMove {
-            0% { left: -300px; }
-            60% { left: 40px; }
-            100% { left: 420px; }
-        }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>1 Ride Pass — Codiac Transit</title>
+<style>
+  /* Use iOS system font (SF Pro / San Francisco) */
+  :root{
+    --pass-bg: #A34464; /* Option A chosen color */
+    --yellow: #FFD800;
+    --button: #FF6A58;
+    --button-shadow: rgba(231,76,60,0.25);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background:#f5f5f5;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
+    padding:18px 0;
+  }
 
-        /* Custom Styles for Bus Scene */
-        .bus-scene {
-            position: relative;
-            width: 100%;
-            min-height: 150px; /* Setting a minimum height to ensure animation space */
-            overflow: hidden;
-            margin-bottom: 1.5rem; /* my-6 equivalent */
-        }
-        .buildings {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            z-index: 1;
-        }
-        .bus {
-            position: absolute;
-            bottom: 5px;
-            width: 240px;
-            z-index: 5;
-            animation: busMove 3s linear infinite;
-        }
+  .phone-container{
+    width:390px;
+    height:844px;
+    background:white;
+    border-radius:20px;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,0.15);
+    position:relative;
+  }
 
-        /* Helper for the phone frame shadow/max-width */
-        .phone-frame {
-            width: 100%; 
-            max-width: 24rem; /* max-w-md */
-            height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3); /* shadow-2xl equivalent */
-            background-color: white;
-        }
-    </style>
+  /* Top status + nav */
+  .status-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 18px;
+    font-weight:600;
+    font-size:16px;
+  }
+
+  .nav-row{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:8px 16px 0 16px;
+  }
+
+  .menu-icon{width:26px; height:18px; display:flex; flex-direction:column; justify-content:space-between}
+  .menu-icon span{height:3px;background:#333;border-radius:2px;display:block}
+  .back-icon::before{content:"‹"; font-size:34px; color:#333; line-height:18px}
+
+  .content{
+    padding:16px;
+    display:flex;
+    justify-content:center;
+  }
+
+  .pass-card{
+    width:100%;
+    max-width:350px;
+    background:var(--pass-bg);
+    color:#fff;
+    border-radius:12px;
+    padding:18px 20px 28px 20px;
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.02);
+    text-align:center;
+  }
+
+  .top-small{
+    font-size:16px;
+    opacity:0.95;
+    margin-bottom:8px;
+  }
+
+  .date{
+    font-size:40px;
+    font-weight:800;
+    margin-bottom:8px;
+    line-height:1;
+  }
+
+  .time{
+    font-size:34px;
+    font-weight:800;
+    margin-bottom:8px;
+  }
+
+  .transit-name{
+    font-size:40px;
+    font-weight:900;
+    color:var(--yellow);
+    margin:8px 0 6px 0;
+  }
+
+  .route{
+    font-size:18px;
+    margin-bottom:14px;
+    opacity:0.95;
+  }
+
+  /* Scene area: buildings + bus */
+  .bus-scene{
+    position:relative;
+    width:100%;
+    height:170px; /* increased so building fits */
+    overflow:hidden;
+    margin:8px 0 18px 0;
+    border-radius:6px;
+    display:block;
+  }
+
+  /* Use the uploaded local file path for buildings (will be transformed by environment) */
+  .buildings{
+    position:absolute;
+    left:0;
+    bottom:0;
+    height:100%;
+    width:auto;
+    object-fit:contain;
+    z-index:1;
+  }
+
+  .bus{
+    position:absolute;
+    bottom:12px; /* tweak so bus sits on road */
+    left:-320px;  /* start off-screen */
+    width:240px;
+    max-width:60%;
+    height:auto;
+    z-index:10;
+    animation:busMove 3.5s linear infinite;
+    will-change: transform, left;
+  }
+
+  @keyframes busMove{
+    0%{ left:-320px; transform:translateX(0) }
+    60%{ left:48px; transform:translateX(0) }
+    100%{ left:420px; transform:translateX(0) }
+  }
+
+  .expire-btn{
+    display:inline-block;
+    margin:6px auto 12px auto;
+    background:var(--button);
+    color:white;
+    border:none;
+    padding:14px 56px;
+    border-radius:40px;
+    font-size:18px;
+    font-weight:600;
+    box-shadow:0 8px 20px var(--button-shadow);
+    cursor:pointer;
+  }
+
+  .expire-text{
+    font-size:20px;
+    font-weight:700;
+    margin:10px 0 6px 0;
+  }
+
+  .user-id{
+    font-size:14px;
+    opacity:0.9;
+    margin-top:6px;
+  }
+
+  /* bottom nav (kept same pastel style) */
+  .bottom-nav{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    padding:14px 10px 22px 10px;
+    background:#fff;
+    border-top:1px solid #eee;
+  }
+
+  .nav-item{display:flex;flex-direction:column;align-items:center;font-size:13px;color:#222}
+  .nav-icon{
+    width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    background:rgba(0,0,0,0.04); margin-bottom:8px; font-size:22px;
+  }
+  .nav-item.active .nav-icon{background:#7ee0e0;color:#fff}
+
+  /* small responsive tweak */
+  @media (max-width:420px){
+    .phone-container{transform:scale(0.98)}
+  }
+</style>
 </head>
-<body class="bg-gray-100">
-    <div id="root" class="w-full h-screen bg-gray-100 flex justify-center items-start">
-        <div class="phone-frame">
-            
-            <div class="w-full bg-white px-4 py-3 flex justify-between items-center text-sm font-bold text-gray-800">
-                <span id="status-bar-time"></span>
-                <div class="flex items-center space-x-1.5">
-                    <div class="flex items-center space-x-1">
-                        <span></span>
-                    </div>
-                </div>
-            </div>
-
-            <header class="w-full bg-white px-4 py-2 flex items-center text-gray-800 border-b border-gray-100">
-                <button aria-label="Menu" class="focus:outline-none">
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                    </svg>
-                </button>
-                <button aria-label="Back" class="ml-4 focus:outline-none">
-                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-                    </svg>
-                </button>
-            </header>
-            
-            <main class="flex-grow p-4 bg-white overflow-y-auto">
-                <div class="w-full rounded-none bg-[#376484] text-white px-6 py-8 flex flex-col items-center text-center shadow-lg">
-                    <p class="text-lg">UNBSU Undergrad Pass</p>
-                    <p id="pass-date" class="text-4xl font-bold mt-4"></p>
-                    <p id="pass-time" class="text-4xl font-bold mt-2"></p>
-                    <p class="text-5xl font-extrabold text-yellow-300 my-4">Fredericton Transit</p>
-                    <p class="text-xl">10N Carlisle</p>
-                    
-                    <div class="bus-scene">
-                        <img class="buildings" src="images/buildings.jpg" alt="City Buildings Silhouette">
-                        <img class="bus" src="images/bus.jpg" alt="Moving Transit Bus">
-                    </div>
-
-                    <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-12 rounded-full text-lg shadow-md transition-colors focus:outline-none">
-                        Expire
-                    </button>
-
-                    <div class="mt-4">
-                       <p id="expiration-text" class="text-lg">This pass expires after 14 minutes</p>
-                       <p class="text-sm opacity-80 mt-1">User ID 1111578593</p>
-                    </div>
-                </div>
-            </main>
-            
-            <nav class="w-full bg-white border-t border-gray-200 flex justify-around items-center py-2">
-                <button class="flex flex-col items-center justify-center space-y-1 w-1/4 focus:outline-none">
-                    <div class="relative p-3 rounded-full">
-                       <svg class="h-7 w-7 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h7.5" />
-                       </svg>
-                    </div>
-                    <span class="text-xs font-medium text-gray-600">Home</span>
-                </button>
-                <button class="flex flex-col items-center justify-center space-y-1 w-1/4 focus:outline-none">
-                    <div class="relative p-3 rounded-full">
-                       <svg class="h-7 w-7 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 17.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                       </svg>
-                    </div>
-                    <span class="text-xs font-medium text-gray-600">Parking</span>
-                </button>
-                <button class="flex flex-col items-center justify-center space-y-1 w-1/4 focus:outline-none">
-                    <div class="relative p-3 rounded-full bg-cyan-100">
-                       <svg class="h-7 w-7 text-cyan-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                       </svg>
-                    </div>
-                    <span class="text-xs font-medium text-cyan-600">Transit</span>
-                </button>
-                <button class="flex flex-col items-center justify-center space-y-1 w-1/4 focus:outline-none">
-                    <div class="relative p-3 rounded-full">
-                       <svg class="h-7 w-7 text-gray-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 5.25h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5m-16.5 4.5h16.5" />
-                       </svg>
-                    </div>
-                    <span class="text-xs font-medium text-gray-600">Permits</span>
-                </button>
-            </nav>
-        </div>
+<body>
+  <div class="phone-container">
+    <div class="status-row">
+      <div id="status-time">11:01</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div>📶</div><div>📶</div><div style="background:#FFD700;padding:3px 7px;border-radius:6px;font-weight:700">46</div>
+      </div>
     </div>
 
-    <script>
-        // Use a static date for the pass based on the initial code's intention (Sat Nov 09 2025)
-        const passFixedDate = new Date('2025-11-09T00:00:00');
-        
-        function formatPassDate(date) {
-            // Match the desired format: Sat Nov 09 2025
-            return date.toLocaleDateString('en-US', {
-                weekday: 'short',
-                month: 'short',
-                day: '2-digit',
-                year: 'numeric',
-            }).replace(',', '');
-        }
+    <div class="nav-row">
+      <div class="menu-icon" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="back-icon" aria-hidden="true"></div>
+    </div>
 
-        function updateClocksAndPassStatus() {
-            const now = new Date();
-            
-            // --- Set the static date on the pass (only needs to be done once) ---
-            document.getElementById('pass-date').textContent = formatPassDate(passFixedDate);
+    <div class="content">
+      <div class="pass-card">
+        <div class="top-small">1 Ride Pass</div>
 
-            // --- Real-time clock updates ---
-            
-            // Status bar time (Updates every minute/second)
-            const statusBarFormattedTime = now.toLocaleTimeString([], {
-                hour: 'numeric',
-                minute: '2-digit',
-                hour12: false,
-            });
-            document.getElementById('status-bar-time').textContent = statusBarFormattedTime;
+        <div id="ast-date" class="date">Loading...</div>
+        <div id="ast-time" class="time">--:--:--</div>
 
-            // Pass time (Updates every second with AM/PM and seconds)
-            const passFormattedTime = now.toLocaleTimeString('en-US', {
-                hour: 'numeric',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true,
-            });
-            document.getElementById('pass-time').textContent = passFormattedTime;
-        }
+        <div class="transit-name">Codiac Transit</div>
+        <div class="route">#50 Red</div>
 
-        // --- Pass expiration countdown ---
-        let minutesLeft = 14;
-        const expirationTextEl = document.getElementById('expiration-text');
+        <!-- Bus scene: building uses your uploaded file path (local). -->
+        <div class="bus-scene" aria-hidden="true">
+          <!-- Use uploaded building image path from your environment -->
+          <img class="buildings" src="/mnt/data/pass.jpg" alt="Buildings background">
+          <!-- Bus image: put your bus file in images/bus.png OR change path to your uploaded bus file location -->
+          <img class="bus" src="images/bus.png" alt="Bus">
+        </div>
 
-        function updateExpiration() {
-            if (minutesLeft > 0) {
-                minutesLeft--;
-                expirationTextEl.textContent = `This pass expires after ${minutesLeft} minutes`;
-                expirationTextEl.classList.remove('font-semibold');
-            } else {
-                expirationTextEl.textContent = 'This pass has expired.';
-                expirationTextEl.classList.add('font-semibold');
-                clearInterval(expirationInterval); // Stop the timer once expired
-            }
-        }
-        
-        // --- Set intervals to run the functions ---
-        document.addEventListener('DOMContentLoaded', () => {
-            updateClocksAndPassStatus(); // Initial call to display time immediately
-            setInterval(updateClocksAndPassStatus, 1000); // Update clocks every second
+        <button class="expire-btn" type="button">Expire</button>
 
-            // Initialize expiration text
-            expirationTextEl.textContent = `This pass expires after ${minutesLeft} minutes`;
-            // Start the minute-based countdown
-            const expirationInterval = setInterval(updateExpiration, 1000 * 60); 
-        });
-    </script>
+        <div class="expire-text">This pass expires after <span id="expires-min">89</span> minutes</div>
+        <div class="user-id">User ID 1111578593</div>
+      </div>
+    </div>
+
+    <div class="bottom-nav" role="navigation" aria-label="Bottom navigation">
+      <div class="nav-item"><div class="nav-icon">🏠</div>Home</div>
+      <div class="nav-item"><div class="nav-icon">🅿️</div>Parking</div>
+      <div class="nav-item active"><div class="nav-icon">🚌</div>Transit</div>
+      <div class="nav-item"><div class="nav-icon">🆔</div>Permits</div>
+    </div>
+  </div>
+
+<script>
+  // AST clock: show date + time every second in America/Halifax (AST)
+  function updateAST() {
+    const now = new Date();
+    const astTime = now.toLocaleString('en-US', { timeZone: 'America/Halifax',
+      hour12: true,
+      hour: 'numeric', minute: '2-digit', second: '2-digit'
+    });
+    const astDate = now.toLocaleDateString('en-US', { timeZone: 'America/Halifax',
+      weekday: 'short', month: 'short', day: '2-digit', year: 'numeric'
+    });
+
+    // Put values
+    const timeEl = document.getElementById('ast-time');
+    const dateEl = document.getElementById('ast-date');
+    const statusEl = document.getElementById('status-time');
+
+    if(timeEl) timeEl.innerText = astTime;
+    if(dateEl) dateEl.innerText = astDate;
+
+    // Also update small status time (HH:MM)
+    const parts = astTime.split(':');
+    if(statusEl && parts.length >= 2){
+      statusEl.innerText = parts[0] + ':' + parts[1].slice(0,2).trim();
+    }
+  }
+  setInterval(updateAST, 1000);
+  updateAST();
+
+  // If you don't have images/bus.png present, the bus won't show.
+  // If you uploaded bus to a different path (e.g. /mnt/data/your-bus.png),
+  // replace the .bus src here programmatically:
+  (function ensureBusPath(){
+    const busImg = document.querySelector('.bus');
+    // Example: if bus image is uploaded to /mnt/data/WhatsApp Image 2025-11-09 at 20.21.29_77f8c96e.jpg
+    // busImg.src = '/mnt/data/WhatsApp Image 2025-11-09 at 20.21.29_77f8c96e.jpg';
+    // If bus image already exists at "images/bus.png", nothing to do.
+  })();
+
+  // (Optional) simple expire countdown example (shows minutes remaining)
+  // If you want a live countdown in minutes/seconds, replace logic here.
+  // For now it shows a static minutes number; here's an example to count down from 89 minutes:
+  (function startCountdownMinutes(mins){
+    const end = Date.now() + mins*60*1000;
+    const el = document.getElementById('expires-min');
+    if(!el) return;
+    function tick(){
+      const left = Math.max(0, end - Date.now());
+      const minutesLeft = Math.ceil(left / (60*1000));
+      el.innerText = minutesLeft;
+      if(left>0) requestAnimationFrame(()=>setTimeout(tick, 1000));
+    }
+    tick();
+  })(89); // starts from 89 as in your screenshot
+
+</script>
 </body>
 </html>
