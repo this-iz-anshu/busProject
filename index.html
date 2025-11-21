@@ -78,22 +78,22 @@
   }
 
   .date{
-    font-size:40px;
-    font-weight:800;
-    margin-bottom:8px;
+    font-size:33px;
+    font-weight:700;
+    margin-bottom:12px;
     line-height:1;
   }
 
   .time{
-    font-size:34px;
-    font-weight:800;
+    font-size:32px;
+    font-weight:700;
     margin-bottom:8px;
   }
 
   .transit-name{
-    font-size:40px;
-    font-weight:900;
-    color:var(--yellow);
+    font-size:35px;
+    font-weight:730;
+    color:yellow;
     margin:8px 0 6px 0;
   }
 
@@ -201,7 +201,6 @@
     <div class="status-row">
       <div id="status-time">11:01</div>
       <div style="display:flex;align-items:center;gap:10px;">
-        <div>📶</div><div>📶</div><div style="background:#FFD700;padding:3px 7px;border-radius:6px;font-weight:700">46</div>
       </div>
     </div>
 
@@ -223,9 +222,9 @@
         <!-- Bus scene: building uses your uploaded file path (local). -->
         <div class="bus-scene" aria-hidden="true">
           <!-- Use uploaded building image path from your environment -->
-          <img class="buildings" src="/mnt/data/pass.jpg" alt="Buildings background">
+          <img class="buildings" src="images/buildings.jpg" alt="Buildings background">
           <!-- Bus image: put your bus file in images/bus.png OR change path to your uploaded bus file location -->
-          <img class="bus" src="images/bus.png" alt="Bus">
+          <img class="bus" src="images/bus.jpg" alt="Bus">
         </div>
 
         <button class="expire-btn" type="button">Expire</button>
@@ -296,7 +295,7 @@
       if(left>0) requestAnimationFrame(()=>setTimeout(tick, 1000));
     }
     tick();
-  })(89); // starts from 89 as in your screenshot
+  })(15); // starts from 89 as in your screenshot
 
 </script>
 </body>
